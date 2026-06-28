@@ -62,6 +62,15 @@
     color: var(--text);
   }
   nav .logo span { color: var(--accent); }
+  .progress-bar {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 200;
+    height: 2px; background: transparent;
+  }
+  .progress-bar .fill {
+    height: 100%; width: 0%;
+    background: linear-gradient(90deg, var(--accent), var(--cyan));
+    transition: width 0.1s linear;
+  }
   nav ul { display: flex; list-style: none; gap: 2px; }
   nav ul a {
     color: var(--text-dim);
@@ -519,6 +528,21 @@
   footer p { font-size: 12px; color: var(--text-dim); }
   footer .mono { font-family: var(--font-mono); font-size: 10px; letter-spacing: 1px; text-transform: uppercase; color: var(--text-dim); }
 
+  .btt {
+    position: fixed; bottom: 32px; right: 32px; z-index: 99;
+    width: 40px; height: 40px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    color: var(--text-muted);
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    opacity: 0; visibility: hidden;
+    transition: opacity 0.3s, visibility 0.3s, background 0.2s;
+    font-size: 18px; line-height: 1;
+  }
+  .btt.visible { opacity: 1; visibility: visible; }
+  .btt:hover { background: var(--surface-2); color: var(--accent); border-color: var(--accent-dim); }
+
   /* ── RESPONSIVE ── */
   @media (max-width: 900px) {
     section { padding: 64px 0; }
@@ -531,6 +555,7 @@
 </head>
 <body>
 
+<div class="progress-bar"><div class="fill" id="pgfill"></div></div>
 <nav id="topnav">
   <div class="wrap">
     <div class="logo"><span>DARK</span> WEB</div>
@@ -1055,28 +1080,115 @@
   </div>
 </footer>
 
+<button class="btt" id="btt" aria-label="Back to top">&#8593;</button>
+
 <script>
-  document.querySelectorAll('nav ul a').forEach(function(el) {
+(function() {
+  var nav = document.getElementById('topnav');
+  var navLinks = nav.querySelectorAll('ul a');
+  var navToggle = nav.querySelector('.nav-toggle');
+  var navUl = nav.querySelector('ul');
+  var btt = document.getElementById('btt');
+  var pgFill = document.getElementById('pgfill');
+  var sections = [].slice.call(document.querySelectorAll('section[id]'));
+  var hero = document.querySelector('.hero');
+
+  // ── mobile nav close on link click ──
+  navLinks.forEach(function(el) {
     el.addEventListener('click', function() {
-      document.querySelector('nav ul').classList.remove('open');
+      navUl.classList.remove('open');
     });
   });
 
-  var observer = new IntersectionObserver(function(entries) {
-    entries.forEach(function(entry) {
-      if (entry.isIntersecting) {
-        entry.target.style.opacity = '1';
-        entry.target.style.transform = 'translateY(0)';
+  // ── scroll progress + nav highlight + back-to-top ──
+  var ticking = false;
+  function onScroll() {
+    var scrollY = window.scrollY;
+    var docH = document.documentElement.scrollHeight - window.innerHeight;
+    var pct = docH > 0 ? Math.min(scrollY / docH * 100, 100) : 0;
+    pgFill.style.width = pct + '%';
+
+    btt.classList.toggle('visible', scrollY > window.innerHeight * 0.6);
+
+    var cur = 'intro';
+    sections.forEach(function(sec) {
+      var top = sec.offsetTop - 120;
+      var bot = top + sec.offsetHeight;
+      if (scrollY >= top && scrollY < bot) cur = sec.id;
+    });
+    navLinks.forEach(function(a) {
+      var href = a.getAttribute('href').replace('#','');
+      a.style.color = href === cur ? 'var(--text)' : '';
+      a.style.background = href === cur ? 'rgba(167,139,250,0.08)' : '';
+    });
+    ticking = false;
+  }
+  window.addEventListener('scroll', function() { if (!ticking) requestAnimationFrame(onScroll); ticking = true; });
+  onScroll();
+
+  // ── back to top ──
+  btt.addEventListener('click', function() { window.scrollTo({ top: 0, behavior: 'smooth' }); });
+
+  // ── fade-in observer ──
+  var fadeEls = [].slice.call(document.querySelectorAll('section, .card, .stat-box, .tl-item, .col-block, .ice-layer, .dt-wrap'));
+  var fo = new IntersectionObserver(function(entries) {
+    entries.forEach(function(e) {
+      if (e.isIntersecting) {
+        e.target.style.opacity = '1';
+        e.target.style.transform = 'translateY(0)';
+        fo.unobserve(e.target);
       }
     });
-  }, { threshold: 0.08 });
-
-  document.querySelectorAll('section, .card, .stat-box, .tl-item, .col-block, .ice-layer, .dt-wrap').forEach(function(el) {
+  }, { threshold: 0.06, rootMargin: '0px 0px -40px 0px' });
+  fadeEls.forEach(function(el) {
     el.style.opacity = '0';
-    el.style.transform = 'translateY(16px)';
-    el.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
-    observer.observe(el);
+    el.style.transform = 'translateY(24px)';
+    el.style.transition = 'opacity 0.6s cubic-bezier(0.22,1,0.36,1), transform 0.6s cubic-bezier(0.22,1,0.36,1)';
+    fo.observe(el);
   });
+
+  // ── animated counters ──
+  var counted = false;
+  var co = new IntersectionObserver(function(entries) {
+    entries.forEach(function(e) {
+      if (e.isIntersecting && !counted) {
+        counted = true;
+        [].slice.call(document.querySelectorAll('.hp-num, .s-num')).forEach(function(el) {
+          var txt = el.textContent.trim();
+          var match = txt.match(/^[\d,.]+/);
+          if (!match) return;
+          var target = parseFloat(match[0].replace(/,/g,''));
+          var suffix = txt.slice(match[0].length);
+          var isPct = suffix.indexOf('%') !== -1;
+          var isK = suffix.indexOf('K') !== -1;
+          var isB = suffix.indexOf('B') !== -1;
+          var prefix = '';
+          if (txt.indexOf('<') !== -1) prefix = '<';
+          var duration = 1500;
+          var start = performance.now();
+          function frame(now) {
+            var t = Math.min((now - start) / duration, 1);
+            var eased = 1 - Math.pow(1 - t, 3);
+            var val = target * eased;
+            var display;
+            if (isB) display = '$' + (val / 1e9).toFixed(1) + 'B';
+            else if (isK) display = Math.round(val / 1000) + 'K';
+            else if (target >= 10000) display = Math.round(val).toLocaleString();
+            else if (isPct) display = Math.round(val) + '%';
+            else if (Number.isInteger(target)) display = Math.round(val).toLocaleString();
+            else display = val.toFixed(1);
+            el.textContent = prefix + display;
+            if (t < 1) requestAnimationFrame(frame);
+          }
+          requestAnimationFrame(frame);
+        });
+        co.unobserve(e.target);
+      }
+    });
+  }, { threshold: 0.3 });
+  var statsSec = document.querySelector('.stat-row');
+  if (statsSec) co.observe(statsSec);
+})();
 </script>
 </body>
 </html>
