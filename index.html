@@ -8,25 +8,25 @@
   @import url('https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&family=JetBrains+Mono:wght@400;500;600&display=swap');
 
   :root {
-    --bg: #06060C;
-    --surface: #0B0B14;
-    --surface-hover: #111120;
-    --border: rgba(255,255,255,0.05);
-    --border-hover: rgba(255,255,255,0.1);
-    --text: rgba(255,255,255,0.92);
-    --text-secondary: rgba(255,255,255,0.55);
-    --text-tertiary: rgba(255,255,255,0.32);
-    --accent: #7C7CF0;
-    --accent-dim: #6366E6;
-    --accent-glow: rgba(124,124,240,0.1);
-    --green: #34D399;
-    --red: #FB7185;
-    --cyan: #22D3EE;
-    --amber: #FBBF24;
-    --radius: 16px;
-    --radius-sm: 10px;
-    --radius-xs: 6px;
-    --ease: cubic-bezier(0.22, 1, 0.36, 1);
+    --bg: #030305;
+    --surface: #0a0a0f;
+    --surface-hover: #12121a;
+    --border: rgba(255,255,255,0.08);
+    --border-hover: rgba(255,255,255,0.15);
+    --text: rgba(255,255,255,0.95);
+    --text-secondary: rgba(255,255,255,0.65);
+    --text-tertiary: rgba(255,255,255,0.4);
+    --accent: #5e6ad2;
+    --accent-dim: #4a55b3;
+    --accent-glow: rgba(94, 106, 210, 0.2);
+    --green: #10b981;
+    --red: #f43f5e;
+    --cyan: #06b6d4;
+    --amber: #f59e0b;
+    --radius: 12px;
+    --radius-sm: 8px;
+    --radius-xs: 4px;
+    --ease: cubic-bezier(0.25, 1, 0.5, 1);
     --font: 'Inter', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
     --mono: 'JetBrains Mono', 'SF Mono', ui-monospace, monospace;
   }
@@ -58,11 +58,13 @@
   /* ── NAV ── */
   nav {
     position: fixed; top: 0; left: 0; right: 0; z-index: 100;
-    background: rgba(6,6,12,0.72);
-    backdrop-filter: blur(20px) saturate(1.3);
-    -webkit-backdrop-filter: blur(20px) saturate(1.3);
-    height: 56px;
+    background: rgba(3, 3, 5, 0.85);
+    backdrop-filter: blur(24px) saturate(1.5);
+    -webkit-backdrop-filter: blur(24px) saturate(1.5);
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+    height: 64px;
     display: flex; align-items: center;
+    transition: all 0.3s var(--ease);
   }
   nav .wrap { display: flex; align-items: center; justify-content: space-between; width: 100%; }
   nav .logo {
@@ -531,6 +533,58 @@
   }
   .iblock strong { color: var(--accent); font-weight: 500; }
 
+  /* ── ROUTING DIAGRAM ── */
+  .routing-diagram {
+    display: flex; align-items: center; justify-content: space-between;
+    margin: 40px 0; padding: 30px; background: var(--surface);
+    border-radius: var(--radius); border: 1px solid var(--border);
+    position: relative; overflow: hidden;
+  }
+  .rd-node {
+    padding: 12px 24px; border-radius: var(--radius-sm);
+    font-family: var(--mono); font-size: 13px; font-weight: 600; z-index: 2;
+    background: rgba(3, 3, 5, 0.9); border: 1px solid var(--border);
+    box-shadow: 0 0 15px rgba(0,0,0,0.5);
+  }
+  .rd-node.user { color: #fff; border-color: rgba(255,255,255,0.2); }
+  .rd-node.guard { color: var(--green); border-color: rgba(16,185,129,0.3); box-shadow: 0 0 20px rgba(16,185,129,0.1); }
+  .rd-node.middle { color: var(--amber); border-color: rgba(245,158,11,0.3); box-shadow: 0 0 20px rgba(245,158,11,0.1); }
+  .rd-node.exit { color: var(--red); border-color: rgba(244,63,94,0.3); box-shadow: 0 0 20px rgba(244,63,94,0.1); }
+  .rd-node.dest { color: var(--cyan); border-color: rgba(6,182,212,0.3); box-shadow: 0 0 20px rgba(6,182,212,0.1); }
+
+  .rd-path {
+    flex-grow: 1; height: 2px; background: var(--border);
+    position: relative; margin: 0 10px; overflow: hidden;
+  }
+  .rd-packet {
+    position: absolute; top: 0; left: 0; width: 20%; height: 100%;
+    background: linear-gradient(90deg, transparent, var(--accent), transparent);
+    animation: packet-move 2s infinite linear;
+  }
+  @keyframes packet-move { 0% { transform: translateX(-100%); } 100% { transform: translateX(500%); } }
+  
+  @media (max-width: 768px) {
+    .routing-diagram { flex-direction: column; gap: 20px; }
+    .rd-path { width: 2px; height: 30px; margin: 10px 0; }
+    .rd-packet { width: 100%; height: 20%; background: linear-gradient(180deg, transparent, var(--accent), transparent); animation: packet-move-v 2s infinite linear; }
+    @keyframes packet-move-v { 0% { transform: translateY(-100%); } 100% { transform: translateY(500%); } }
+  }
+
+  /* ── MARKET CHART ── */
+  .market-chart {
+    background: var(--surface); padding: 30px; border-radius: var(--radius);
+    border: 1px solid var(--border); margin: 40px 0;
+  }
+  .market-chart h4 {
+    font-family: var(--mono); font-size: 12px; color: var(--text-secondary);
+    margin-bottom: 20px; text-transform: uppercase; letter-spacing: 1px;
+  }
+  .mc-bar-group { margin-bottom: 16px; }
+  .mc-bar-group:last-child { margin-bottom: 0; }
+  .mc-label { font-size: 13px; margin-bottom: 8px; color: var(--text); display: flex; justify-content: space-between; }
+  .mc-track { width: 100%; height: 8px; background: rgba(255,255,255,0.05); border-radius: 4px; overflow: hidden; }
+  .mc-fill { height: 100%; width: 0; border-radius: 4px; transition: width 1.5s cubic-bezier(0.25, 1, 0.5, 1); box-shadow: 0 0 10px rgba(255,255,255,0.2); }
+
   /* ── GRID 2 ── */
   .grid-2 {
     display: grid;
@@ -600,7 +654,10 @@
 <div class="progress-bar"><div class="fill" id="pgfill"></div></div>
 <nav id="topnav">
   <div class="wrap">
-    <div class="logo"><span>DARK</span> WEB</div>
+    <div class="logo" style="display:flex; align-items:center; gap:10px;">
+      <img src="assets/logo.png" alt="Logo" width="28" height="28" style="border-radius:6px; box-shadow: 0 0 10px var(--accent-glow);">
+      <div><span>DARK</span> WEB</div>
+    </div>
     <button class="nav-toggle" onclick="document.querySelector('nav ul').classList.toggle('open')">&#9776;</button>
     <ul>
       <li><a href="#intro">Intro</a></li>
@@ -669,6 +726,18 @@
     <div class="sec-label">02 &mdash; How It Works</div>
     <h2 class="sec-h">Tor&rsquo;s Onion Routing <span class="highlight">Architecture</span></h2>
     <p class="sec-p wide">Tor routes traffic through three relay nodes using layered encryption &mdash; each node decrypts only its own layer, revealing only the next hop. No single relay knows both the client&rsquo;s origin and the final destination.</p>
+
+    <div class="routing-diagram">
+      <div class="rd-node user">Client</div>
+      <div class="rd-path"><div class="rd-packet"></div></div>
+      <div class="rd-node guard">Guard</div>
+      <div class="rd-path"><div class="rd-packet" style="animation-delay: 0.5s"></div></div>
+      <div class="rd-node middle">Middle</div>
+      <div class="rd-path"><div class="rd-packet" style="animation-delay: 1s"></div></div>
+      <div class="rd-node exit">Exit</div>
+      <div class="rd-path"><div class="rd-packet" style="animation-delay: 1.5s"></div></div>
+      <div class="rd-node dest">Server</div>
+    </div>
 
     <div class="two-col">
       <div class="col-block">
@@ -816,6 +885,26 @@
     <div class="sec-label">06 &mdash; Criminal Ecosystems</div>
     <h2 class="sec-h">Illicit Markets &amp; <span class="highlight">Crime</span></h2>
     <p class="sec-p wide">Darknet markets processed approximately <code>$2.6B</code> in cryptocurrency inflows in 2025. The ecosystem has evolved from Silk Road into a resilient network of interconnected markets that rapidly adapt to takedowns.</p>
+
+    <div class="market-chart">
+      <h4>Market Inflows (2025 Breakdown)</h4>
+      <div class="mc-bar-group">
+        <div class="mc-label"><span>Narcotics</span><span>60%</span></div>
+        <div class="mc-track"><div class="mc-fill" data-w="60%" style="background: var(--accent);"></div></div>
+      </div>
+      <div class="mc-bar-group">
+        <div class="mc-label"><span>Fraud/Identity</span><span>25%</span></div>
+        <div class="mc-track"><div class="mc-fill" data-w="25%" style="background: var(--cyan);"></div></div>
+      </div>
+      <div class="mc-bar-group">
+        <div class="mc-label"><span>RaaS / Malware</span><span>10%</span></div>
+        <div class="mc-track"><div class="mc-fill" data-w="10%" style="background: var(--red);"></div></div>
+      </div>
+      <div class="mc-bar-group">
+        <div class="mc-label"><span>Other</span><span>5%</span></div>
+        <div class="mc-track"><div class="mc-fill" data-w="5%" style="background: var(--text-tertiary);"></div></div>
+      </div>
+    </div>
 
     <div class="card-grid">
       <div class="card">
@@ -1155,12 +1244,20 @@
   btt.addEventListener('click', function() { window.scrollTo({ top: 0, behavior: 'smooth' }); });
 
   // ── fade-in observer ──
-  var fadeEls = [].slice.call(document.querySelectorAll('section, .card, .stat-box, .tl-item, .col-block, .ice-layer, .dt-wrap'));
+  var fadeEls = [].slice.call(document.querySelectorAll('section, .card, .stat-box, .tl-item, .col-block, .ice-layer, .dt-wrap, .routing-diagram, .market-chart'));
   var fo = new IntersectionObserver(function(entries) {
     entries.forEach(function(e) {
       if (e.isIntersecting) {
         e.target.style.opacity = '1';
         e.target.style.transform = 'translateY(0)';
+        
+        if (e.target.classList.contains('market-chart')) {
+          var fills = e.target.querySelectorAll('.mc-fill');
+          fills.forEach(function(f) {
+            f.style.width = f.getAttribute('data-w');
+          });
+        }
+        
         fo.unobserve(e.target);
       }
     });

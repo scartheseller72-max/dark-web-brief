@@ -1,47 +1,53 @@
+![The Dark Web Banner](assets/banner.png)
+
 # The Dark Web — An Evidence-Based Technical Investigation
 
-An in-depth, single-page HTML investigative brief covering the dark web's architecture, history, operational dynamics, law enforcement countermeasures, cryptocurrency forensics, zero-day markets, and censorship resistance arms race — all backed by court filings, declassified intelligence, peer-reviewed research, and official government data.
+<div align="center">
+  <img src="assets/logo.png" alt="Dark Web Brief Logo" width="120" height="120" />
+</div>
 
-## Live Site
+An in-depth, single-page HTML investigative brief covering the dark web's architecture, history, operational dynamics, law enforcement countermeasures, cryptocurrency forensics, zero-day markets, and censorship resistance arms race. All information is meticulously backed by court filings, declassified intelligence, peer-reviewed research, and official government data.
 
-https://scartheseller72-max.github.io/dark-web-brief/
+## Live Environment
 
-## Contents
+A live deployment of this investigation can be accessed at: [ScartheSeller72 Max - Dark Web Brief](https://scartheseller72-max.github.io/dark-web-brief/)
 
-| Chapter | Topic |
-|---------|-------|
-| 1 | What the Dark Web Actually Is |
+## Table of Contents
+
+| Chapter | Topic Focus |
+|---------|-------------|
+| 1 | The Architectural Definition of the Dark Web |
 | 2 | Tor's Onion Routing Architecture |
-| 3 | Origins & Evolution (1995–2026) |
-| 4 | Surface, Deep & Dark: Three Layers |
-| 5 | Legitimate Uses |
-| 6 | Illicit Markets & Criminal Ecosystems |
-| 7 | Operational Security Failures |
-| 8 | Cryptocurrency Forensics |
-| 9 | Zero-Day Exploit Supply Chain |
-| 10 | Censorship Resistance Arms Race |
-| 11 | Beyond Tor: Other Darknets |
-| 12 | Future Directions |
+| 3 | Chronological Evolution (1995–2026) |
+| 4 | Network Stratification: Surface, Deep, and Dark Layers |
+| 5 | Validated Legitimate Use Cases |
+| 6 | Illicit Markets and Criminal Ecosystem Dynamics |
+| 7 | Systemic Operational Security Failures |
+| 8 | Advanced Cryptocurrency Forensics |
+| 9 | The Zero-Day Exploit Supply Chain |
+| 10 | The Censorship Resistance Arms Race |
+| 11 | Alternative Darknet Architectures |
+| 12 | Strategic Future Directions |
 
-## Design
+## Design Architecture
 
-- Dark theme, responsive layout
-- Editorial/magazine visual approach
-- DM Sans + DM Mono typography
-- No external dependencies (self-contained HTML)
-- Scroll-triggered fade-in animations
+This project is built with an enterprise-grade visual identity, adhering strictly to modern web standards:
+- **Visual Presentation**: Dark theme with a responsive, editorial-style layout.
+- **Typography**: Utilizing standard professional fonts for optimal readability.
+- **Architecture**: A fully self-contained HTML architecture requiring zero external dependencies.
+- **Interactivity**: Scroll-triggered fade-in micro-animations for enhanced user experience.
 
-## Sources
+## Empirical Sources
 
-Data drawn from:
+All data and assertions within this brief are meticulously drawn from verified primary sources:
 - Court filings (DOJ, FBI, Europol)
-- Declassified intelligence (Snowden archive)
-- Peer-reviewed research (ACM CCS, USENIX Security, IEEE, PoPETs, arXiv)
-- Industry reports (Chainalysis, TRM Labs, Elliptic)
-- Government sources (UNODC, DEA, ATF/GAO)
-- Tor Project publications
-- OONI censorship measurements
+- Declassified intelligence archives
+- Peer-reviewed academic research (ACM CCS, USENIX Security, IEEE, PoPETs, arXiv)
+- Specialized industry reports (Chainalysis, TRM Labs, Elliptic)
+- Official government intelligence (UNODC, DEA, ATF, GAO)
+- Tor Project technical publications
+- OONI censorship measurement data
 
-## License
+## Licensing and Attribution
 
-Educational reference material. All data attributed to original sources.
+This material is provided strictly for educational and reference purposes. All data is attributed directly to its original source material.
