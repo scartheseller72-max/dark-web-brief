@@ -1,0 +1,14 @@
+# OS
+Thumbs.db
+.DS_Store
+*.swp
+*.swo
+*~
+
+# Editor
+.idea/
+.vscode/
+*.sublime-*
+
+# Git
+.git/
