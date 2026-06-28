@@ -1,0 +1,1082 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Dark Web — An Evidence-Based Investigation</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600;9..40,700;9..40,800&display=swap');
+
+  :root {
+    --bg: #0b0b12;
+    --bg-alt: #0f0f18;
+    --surface: #14141f;
+    --surface-2: #1a1a28;
+    --border: #1e1e30;
+    --border-light: #2a2a40;
+    --text: #d4d4e0;
+    --text-muted: #8888a0;
+    --text-dim: #555570;
+    --accent: #a78bfa;
+    --accent-dim: #6d5cb0;
+    --cyan: #22d3ee;
+    --green: #34d399;
+    --red: #fb7185;
+    --amber: #fbbf24;
+    --radius: 0;
+    --font-sans: 'DM Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+    --font-mono: 'DM Mono', 'JetBrains Mono', monospace;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { scroll-behavior: smooth; font-size: 16px; }
+  body {
+    font-family: var(--font-sans);
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.7;
+    -webkit-font-smoothing: antialiased;
+  }
+  ::selection { background: var(--accent); color: var(--bg); }
+
+  .wrap { max-width: 1200px; margin: 0 auto; padding: 0 32px; }
+  @media (max-width: 768px) { .wrap { padding: 0 20px; } }
+
+  /* ── NAV ── */
+  nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+    background: rgba(11,11,18,0.85); backdrop-filter: blur(16px);
+    border-bottom: 1px solid var(--border);
+    height: 56px;
+    display: flex; align-items: center;
+    transition: border-color 0.3s;
+  }
+  nav.scrolled { border-color: var(--border-light); }
+  nav .wrap { display: flex; align-items: center; justify-content: space-between; width: 100%; }
+  nav .logo {
+    font-family: var(--font-mono);
+    font-size: 13px;
+    font-weight: 500;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--text);
+  }
+  nav .logo span { color: var(--accent); }
+  nav ul { display: flex; list-style: none; gap: 2px; }
+  nav ul a {
+    color: var(--text-dim);
+    text-decoration: none;
+    font-size: 12px;
+    font-weight: 500;
+    letter-spacing: 0.5px;
+    padding: 6px 14px;
+    border-radius: 4px;
+    transition: all 0.2s;
+  }
+  nav ul a:hover { color: var(--text); background: rgba(167,139,250,0.06); }
+  .nav-toggle { display: none; background: none; border: none; color: var(--text); font-size: 20px; cursor: pointer; padding: 4px; }
+
+  @media (max-width: 768px) {
+    nav ul { display: none; position: absolute; top: 56px; left: 0; right: 0; background: rgba(11,11,18,0.98); flex-direction: column; padding: 12px; border-bottom: 1px solid var(--border); gap: 2px; }
+    nav ul.open { display: flex; }
+    .nav-toggle { display: block; }
+  }
+
+  /* ── HERO ── */
+  .hero {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 120px 0 80px;
+    position: relative;
+    overflow: hidden;
+  }
+  .hero-grid {
+    display: grid;
+    grid-template-columns: 1fr 360px;
+    gap: 60px;
+    align-items: center;
+  }
+  .hero h1 {
+    font-size: clamp(2.8rem, 6vw, 4.8rem);
+    font-weight: 800;
+    line-height: 1.02;
+    letter-spacing: -2px;
+    margin-bottom: 20px;
+  }
+  .hero h1 .grad {
+    background: linear-gradient(135deg, var(--text) 40%, var(--accent) 70%, var(--cyan));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+  .hero .lede {
+    font-size: 16px;
+    color: var(--text-muted);
+    line-height: 1.75;
+    max-width: 540px;
+    margin-bottom: 32px;
+  }
+  .hero .meta-strip {
+    display: flex;
+    gap: 28px;
+    flex-wrap: wrap;
+    font-size: 12px;
+    color: var(--text-dim);
+    font-family: var(--font-mono);
+    letter-spacing: 0.5px;
+  }
+  .hero .meta-strip span { display: flex; align-items: center; gap: 8px; }
+  .hero .meta-strip .bul { width: 5px; height: 5px; border-radius: 50%; display: inline-block; background: var(--accent); }
+
+  /* Hero stats panel */
+  .hero-panel {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    padding: 32px;
+  }
+  .hero-panel .hp-item {
+    padding: 16px 0;
+    border-bottom: 1px solid rgba(255,255,255,0.04);
+  }
+  .hero-panel .hp-item:last-child { border-bottom: none; padding-bottom: 0; }
+  .hero-panel .hp-num {
+    font-size: 28px;
+    font-weight: 800;
+    letter-spacing: -0.5px;
+    line-height: 1;
+  }
+  .hero-panel .hp-label {
+    font-size: 11px;
+    color: var(--text-dim);
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    margin-top: 4px;
+  }
+  .hero-panel .hp-num.purple { color: var(--accent); }
+  .hero-panel .hp-num.cyan { color: var(--cyan); }
+  .hero-panel .hp-num.green { color: var(--green); }
+  .hero-panel .hp-num.red { color: var(--red); }
+
+  @media (max-width: 860px) {
+    .hero-grid { grid-template-columns: 1fr; gap: 40px; }
+    .hero-panel { max-width: 400px; }
+  }
+
+  .scroll-hint {
+    position: absolute;
+    bottom: 32px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    color: var(--text-dim);
+    font-size: 10px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    font-family: var(--font-mono);
+    animation: sh 2.5s ease-in-out infinite;
+  }
+  @keyframes sh {
+    0%, 100% { opacity: 0.3; transform: translateX(-50%) translateY(0); }
+    50% { opacity: 0.8; transform: translateX(-50%) translateY(6px); }
+  }
+  .scroll-hint svg { width: 14px; height: 14px; stroke: var(--text-dim); stroke-width: 1.5; fill: none; }
+
+  /* ── SECTION COMMON ── */
+  section { padding: 100px 0; }
+  section + section { border-top: 1px solid var(--border); }
+
+  .sec-label {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--accent-dim);
+    margin-bottom: 8px;
+  }
+  .sec-h {
+    font-size: clamp(1.8rem, 3vw, 2.8rem);
+    font-weight: 700;
+    letter-spacing: -1.5px;
+    line-height: 1.1;
+    margin-bottom: 16px;
+    max-width: 700px;
+  }
+  .sec-h .highlight { color: var(--accent); }
+  .sec-p {
+    font-size: 15px;
+    color: var(--text-muted);
+    line-height: 1.75;
+    max-width: 640px;
+    margin-bottom: 20px;
+  }
+  .sec-p.wide { max-width: 100%; }
+  .sec-p strong { color: var(--text); font-weight: 600; }
+  .sec-p code {
+    font-family: var(--font-mono);
+    font-size: 13px;
+    background: rgba(167,139,250,0.06);
+    padding: 1px 8px;
+    border-radius: 3px;
+    color: var(--accent);
+  }
+
+
+  /* ── TWO-COLUMN ── */
+  .two-col {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 40px;
+    margin: 32px 0;
+  }
+  @media (max-width: 768px) { .two-col { grid-template-columns: 1fr; gap: 24px; } }
+
+  .col-block {
+    border-left: 2px solid var(--border);
+    padding-left: 24px;
+  }
+  .col-block .cb-h {
+    font-size: 14px;
+    font-weight: 700;
+    margin-bottom: 8px;
+    letter-spacing: -0.3px;
+  }
+  .col-block .cb-h .step {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--accent-dim);
+    letter-spacing: 1px;
+    margin-right: 8px;
+  }
+  .col-block p {
+    font-size: 13.5px;
+    color: var(--text-muted);
+    line-height: 1.7;
+  }
+
+  /* ── DATA TABLE ── */
+  .dt-wrap {
+    overflow-x: auto;
+    margin: 32px 0;
+    border: 1px solid var(--border);
+  }
+  table.dt {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+  }
+  table.dt thead { background: var(--surface); }
+  table.dt th {
+    padding: 12px 16px;
+    text-align: left;
+    font-weight: 600;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    color: var(--text-dim);
+    border-bottom: 1px solid var(--border);
+    font-family: var(--font-mono);
+  }
+  table.dt td {
+    padding: 12px 16px;
+    color: var(--text-muted);
+    border-bottom: 1px solid rgba(30,30,48,0.5);
+    vertical-align: top;
+    line-height: 1.6;
+  }
+  table.dt tr:last-child td { border-bottom: none; }
+  table.dt tr:hover td { background: rgba(167,139,250,0.02); }
+  table.dt td strong { color: var(--text); font-weight: 600; }
+  table.dt td code {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    background: rgba(167,139,250,0.06);
+    padding: 1px 6px;
+    border-radius: 3px;
+    color: var(--accent);
+  }
+
+  .tag {
+    display: inline-block;
+    font-family: var(--font-mono);
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: 1px;
+    padding: 2px 10px;
+    border-radius: 2px;
+  }
+  .tag-g { background: rgba(52,211,153,0.1); color: var(--green); }
+  .tag-r { background: rgba(251,113,133,0.1); color: var(--red); }
+  .tag-y { background: rgba(251,191,36,0.1); color: var(--amber); }
+  .tag-b { background: rgba(34,211,238,0.1); color: var(--cyan); }
+  .tag-p { background: rgba(167,139,250,0.1); color: var(--accent); }
+
+  /* ── CARDS ── */
+  .card-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 2px;
+    margin: 32px 0;
+    background: var(--border);
+    border: 1px solid var(--border);
+  }
+  .card {
+    background: var(--surface);
+    padding: 28px;
+  }
+  .card .c-num {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    color: var(--text-dim);
+    margin-bottom: 12px;
+  }
+  .card h3 {
+    font-size: 15px;
+    font-weight: 700;
+    letter-spacing: -0.3px;
+    margin-bottom: 8px;
+  }
+  .card p {
+    font-size: 13px;
+    color: var(--text-muted);
+    line-height: 1.65;
+  }
+  .card .tag { margin-top: 16px; }
+
+  /* ── TIMELINE ── */
+  .tl { position: relative; padding: 8px 0; }
+  .tl::before {
+    content: '';
+    position: absolute;
+    left: 9px;
+    top: 16px;
+    bottom: 16px;
+    width: 1px;
+    background: var(--border-light);
+  }
+  .tl-item { padding-left: 36px; position: relative; margin-bottom: 28px; }
+  .tl-item:last-child { margin-bottom: 0; }
+  .tl-item::before {
+    content: '';
+    position: absolute;
+    left: 3px;
+    top: 4px;
+    width: 13px;
+    height: 13px;
+    border-radius: 50%;
+    background: var(--bg);
+    border: 2px solid var(--accent-dim);
+    transition: border-color 0.3s;
+  }
+  .tl-item:hover::before { border-color: var(--accent); }
+  .tl-item .year {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--accent);
+  }
+  .tl-item h4 {
+    font-size: 15px;
+    font-weight: 700;
+    letter-spacing: -0.3px;
+    margin: 4px 0 6px;
+  }
+  .tl-item p {
+    font-size: 13.5px;
+    color: var(--text-muted);
+    line-height: 1.65;
+  }
+
+  /* ── ICEBERG ── */
+  .iceberg {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin: 40px 0;
+    max-width: 480px;
+  }
+  .ice-layer {
+    width: 100%;
+    padding: 22px 24px;
+    margin-bottom: 2px;
+    position: relative;
+  }
+  .ice-layer .il-name {
+    font-weight: 700;
+    font-size: 14px;
+    letter-spacing: -0.3px;
+  }
+  .ice-layer .il-desc {
+    font-size: 12.5px;
+    margin-top: 4px;
+    line-height: 1.5;
+    opacity: 0.85;
+  }
+  .ice-layer .il-pct {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    margin-top: 6px;
+    opacity: 0.6;
+  }
+  .ice-s { background: #1e3a5f; color: #b0d4ff; }
+  .ice-d { background: #1a1a3e; color: #b8b8f0; width: 90%; margin-left: auto; margin-right: auto; }
+  .ice-dk { background: #14141f; color: #8888a0; width: 78%; margin-left: auto; margin-right: auto; border: 1px solid var(--border); }
+  .ice-sub { background: #0f0f18; color: #555570; width: 65%; margin-left: auto; margin-right: auto; border: 1px solid var(--border); font-size: 12px; }
+
+  /* ── STATS ── */
+  .stat-row {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 2px;
+    margin: 40px 0;
+    border: 1px solid var(--border);
+  }
+  .stat-box {
+    background: var(--surface);
+    padding: 24px;
+    text-align: center;
+  }
+  .stat-box .s-num {
+    font-size: 28px;
+    font-weight: 800;
+    letter-spacing: -0.5px;
+    line-height: 1;
+    color: var(--accent);
+  }
+  .stat-box .s-num.cyan { color: var(--cyan); }
+  .stat-box .s-num.green { color: var(--green); }
+  .stat-box .s-num.red { color: var(--red); }
+  .stat-box .s-num.amber { color: var(--amber); }
+  .stat-box .s-num.mono { color: var(--text); }
+  .stat-box .s-label {
+    font-size: 10px;
+    color: var(--text-dim);
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    margin-top: 6px;
+    font-family: var(--font-mono);
+  }
+
+  /* ── PULL QUOTE ── */
+  .pull {
+    border-left: 2px solid var(--accent-dim);
+    padding: 20px 0 20px 28px;
+    margin: 32px 0;
+  }
+  .pull p {
+    font-size: 15px;
+    color: var(--text);
+    line-height: 1.7;
+    font-weight: 500;
+  }
+  .pull .ref {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--text-dim);
+    margin-top: 8px;
+    letter-spacing: 0.5px;
+  }
+
+  /* ── INFO BLOCK ── */
+  .iblock {
+    background: rgba(167,139,250,0.04);
+    border: 1px solid rgba(167,139,250,0.1);
+    padding: 24px 28px;
+    margin: 24px 0;
+  }
+  .iblock p {
+    font-size: 13.5px;
+    color: var(--text-muted);
+    line-height: 1.65;
+  }
+  .iblock strong { color: var(--accent); font-weight: 600; }
+
+  /* ── GRID 2 ── */
+  .grid-2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 32px;
+    margin: 32px 0;
+  }
+  @media (max-width: 768px) { .grid-2 { grid-template-columns: 1fr; gap: 24px; } }
+
+  /* ── FOOTER ── */
+  footer {
+    border-top: 1px solid var(--border);
+    padding: 48px 0;
+  }
+  footer .fw {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 16px;
+  }
+  footer p { font-size: 12px; color: var(--text-dim); }
+  footer .mono { font-family: var(--font-mono); font-size: 10px; letter-spacing: 1px; text-transform: uppercase; color: var(--text-dim); }
+
+  /* ── RESPONSIVE ── */
+  @media (max-width: 900px) {
+    section { padding: 64px 0; }
+    .hero { min-height: auto; padding: 100px 0 60px; }
+    .card-grid { grid-template-columns: 1fr; }
+    .stat-row { grid-template-columns: repeat(2, 1fr); }
+    .stat-box .s-num { font-size: 22px; }
+  }
+</style>
+</head>
+<body>
+
+<nav id="topnav">
+  <div class="wrap">
+    <div class="logo"><span>DARK</span> WEB</div>
+    <button class="nav-toggle" onclick="document.querySelector('nav ul').classList.toggle('open')">&#9776;</button>
+    <ul>
+      <li><a href="#intro">Intro</a></li>
+      <li><a href="#architecture">Architecture</a></li>
+      <li><a href="#history">History</a></li>
+      <li><a href="#layers">Layers</a></li>
+      <li><a href="#use">Use</a></li>
+      <li><a href="#market">Markets</a></li>
+      <li><a href="#opsec">OpSec</a></li>
+      <li><a href="#crypto">Crypto</a></li>
+      <li><a href="#zeroday">0-Day</a></li>
+    </ul>
+  </div>
+</nav>
+
+<section class="hero">
+  <div class="wrap">
+    <div class="hero-grid">
+      <div>
+        <div class="sec-label" style="margin-bottom:16px;">Investigative Brief &bull; 2026</div>
+        <h1>Inside the <span class="grad">Dark Web</span></h1>
+        <p class="lede">An evidence-based examination of the dark web&rsquo;s architecture, history, operational dynamics, law enforcement countermeasures, and its evolving role in global cybersecurity and organized crime.</p>
+        <div class="meta-strip">
+          <span><span class="bul"></span> 2.5M daily Tor users</span>
+          <span><span class="bul" style="background:var(--cyan);"></span> $2.6B market inflows</span>
+          <span><span class="bul" style="background:var(--green);"></span> 80+ cited sources</span>
+          <span><span class="bul" style="background:var(--red);"></span> 80%+ busts = OpSec errors</span>
+        </div>
+      </div>
+      <div class="hero-panel">
+        <div class="hp-item">
+          <div class="hp-num purple">2.5M</div>
+          <div class="hp-label">Daily Tor Users Globally</div>
+        </div>
+        <div class="hp-item">
+          <div class="hp-num cyan">60K</div>
+          <div class="hp-label">Active .onion Domains</div>
+        </div>
+        <div class="hp-item">
+          <div class="hp-num green">$2.6B</div>
+          <div class="hp-label">Darknet Market Inflows (2025)</div>
+        </div>
+        <div class="hp-item">
+          <div class="hp-num red">80%+</div>
+          <div class="hp-label">Major Busts From OpSec Mistakes</div>
+        </div>
+        <div class="hp-item" style="padding-bottom:0;">
+          <div class="hp-num purple">&lt;0.1%</div>
+          <div class="hp-label">Dark Web as Share of Total Web</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="scroll-hint">
+    SCROLL
+    <svg viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg>
+  </div>
+</section>
+
+<!-- 1: Introduction -->
+<section id="intro">
+  <div class="wrap">
+    <div class="sec-label">01 &mdash; The Landscape</div>
+    <h2 class="sec-h">What the Dark Web Actually Is</h2>
+    <p class="sec-p wide">The dark web is a small, intentionally hidden subset of the internet accessible only through specialized software &mdash; most commonly Tor, I2P, or Freenet. It represents less than <code>0.1%</code> of total web content, yet its mythology has grown to dominate public understanding of hidden networks.</p>
+
+    <div class="grid-2">
+      <div class="col-block">
+        <div class="cb-h"><span class="step">Myth</span> &ldquo;96% of the internet is the dark web&rdquo;</div>
+        <p>This false statistic originates from a 2001 study by Michael K. Bergman estimating the <strong>deep web</strong> (any non-indexed content: email, banking, intranets) at 400&ndash;550 times the size of the surface web. Media later conflated &ldquo;deep web&rdquo; with &ldquo;dark web.&rdquo; The actual dark web is a fraction of a percent of total internet content.</p>
+      </div>
+      <div class="col-block">
+        <div class="cb-h"><span class="step">Reality</span> A dual-use infrastructure</div>
+        <p>The dark web simultaneously serves as critical privacy infrastructure for journalists, dissidents, and whistleblowers in repressive regimes, while hosting illicit markets, fraud forums, and ransomware command infrastructure. Understanding it requires acknowledging both faces without sensationalism.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 2: Architecture -->
+<section id="architecture">
+  <div class="wrap">
+    <div class="sec-label">02 &mdash; How It Works</div>
+    <h2 class="sec-h">Tor&rsquo;s Onion Routing <span class="highlight">Architecture</span></h2>
+    <p class="sec-p wide">Tor routes traffic through three relay nodes using layered encryption &mdash; each node decrypts only its own layer, revealing only the next hop. No single relay knows both the client&rsquo;s origin and the final destination.</p>
+
+    <div class="two-col">
+      <div class="col-block">
+        <div class="cb-h"><span class="step">01</span> Entry Guard</div>
+        <p>Knows your real IP address but not your destination. Chosen from a stable set of guards rotated every 2&ndash;3 months to resist long-term profiling.</p>
+      </div>
+      <div class="col-block">
+        <div class="cb-h"><span class="step">02</span> Middle Relay</div>
+        <p>Knows only the previous and next hop. Has no information about the client or the destination. This decoupling is the core of Tor&rsquo;s anonymity guarantee.</p>
+      </div>
+      <div class="col-block">
+        <div class="cb-h"><span class="step">03</span> Exit Relay</div>
+        <p>Knows the destination but not the client. Decrypts the final layer and forwards to the clearnet. Can inspect unencrypted traffic, making HTTPS critical.</p>
+      </div>
+      <div class="col-block">
+        <div class="cb-h"><span class="step">04</span> Hidden Service (6-hop)</div>
+        <p>For .onion sites, the client builds 3 hops to a rendezvous point; the service builds 3 separate hops to the same point. Neither learns the other&rsquo;s IP address. All V3 onions use ed25519 keys.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 3: History -->
+<section id="history">
+  <div class="wrap">
+    <div class="sec-label">03 &mdash; 1995 to 2026</div>
+    <h2 class="sec-h">Origins &amp; <span class="highlight">Evolution</span></h2>
+    <p class="sec-p wide">The dark web&rsquo;s origins lie in U.S. Naval Research Laboratory work on secure communications &mdash; not cybercrime. Over three decades, the technology evolved through academic, activist, and eventually criminal use.</p>
+
+    <div class="tl">
+      <div class="tl-item">
+        <div class="year">1995</div>
+        <h4>Onion Routing at US Naval Research Lab</h4>
+        <p>David Goldschlag, Mike Reed, and Paul Syverson develop the first onion routing prototypes for protecting government communications.</p>
+      </div>
+      <div class="tl-item">
+        <div class="year">2000</div>
+        <h4>Freenet Released</h4>
+        <p>Ian Clarke launches Freenet, the first modern darknet: a peer-to-peer platform for censorship-resistant publishing. Renamed Hyphanet in 2023.</p>
+      </div>
+      <div class="tl-item">
+        <div class="year">2002</div>
+        <h4>Tor Deployed</h4>
+        <p>Roger Dingledine, Nick Mathewson, and collaborators release the first public Tor network. EFF funds development in 2004. Tor Project becomes a nonprofit in 2006.</p>
+      </div>
+      <div class="tl-item">
+        <div class="year">2011</div>
+        <h4>Silk Road Launches</h4>
+        <p>Ross Ulbricht creates the first major darknet marketplace, combining Tor with Bitcoin. Processes an estimated $1.2B before FBI seizure in October 2013.</p>
+      </div>
+      <div class="tl-item">
+        <div class="year">2013</div>
+        <h4>Snowden &amp; the Arab Spring</h4>
+        <p>Edward Snowden reveals NSA programs targeting Tor users (XKeyscore flags Tor as &ldquo;extremist&rdquo;). Tor downloads surge. Arab Spring demonstrates Tor&rsquo;s role in censorship circumvention.</p>
+      </div>
+      <div class="tl-item">
+        <div class="year">2017</div>
+        <h4>Operation Bayonet</h4>
+        <p>AlphaBay seized; Hansa Market covertly operated as a honeypot for 27 days, collecting 10,000+ buyer addresses. Sets new standards for market infiltration.</p>
+      </div>
+      <div class="tl-item">
+        <div class="year">2021</div>
+        <h4>An0m Sting</h4>
+        <p>FBI runs a fake encrypted phone company for three years. Intercepts 27 million messages. Results in 800+ arrests globally.</p>
+      </div>
+      <div class="tl-item">
+        <div class="year">2024</div>
+        <h4>Bitcoin Fog Conviction</h4>
+        <p>Roman Sterlingov convicted for laundering $400M+ through the Bitcoin Fog mixer. Case proves blockchain analytics + metadata suffice without server access.</p>
+      </div>
+      <div class="tl-item">
+        <div class="year">2026</div>
+        <h4>Current State</h4>
+        <p>Russia, China, Iran escalate Tor blocking with ML-powered DPI. Tor deploys WebTunnel, Conjure, and Snowflake as countermeasures. Darknet markets continue adapting.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 4: Layers -->
+<section id="layers">
+  <div class="wrap">
+    <div class="sec-label">04 &mdash; The Web Stack</div>
+    <h2 class="sec-h">Surface, Deep &amp; Dark: <span class="highlight">Three Layers</span></h2>
+    <p class="sec-p wide">The &ldquo;96% dark web&rdquo; myth persists because people confuse &ldquo;deep web&rdquo; (non-indexed but benign content) with &ldquo;dark web&rdquo; (intentionally hidden, requires special software). The actual hierarchy:</p>
+
+    <div class="iceberg">
+      <div class="ice-layer ice-s">
+        <div class="il-name">Surface Web</div>
+        <div class="il-desc">Indexed by search engines. Public websites, news, social media.</div>
+        <div class="il-pct">~4% of total</div>
+      </div>
+      <div class="ice-layer ice-d">
+        <div class="il-name">Deep Web</div>
+        <div class="il-desc">Not indexed. Email, banking, intranets, cloud storage. Requires login.</div>
+        <div class="il-pct">~95.9% of total</div>
+      </div>
+      <div class="ice-layer ice-dk">
+        <div class="il-name">Dark Web</div>
+        <div class="il-desc">Requires Tor, I2P, or Freenet. Intentional anonymity.</div>
+        <div class="il-pct">~0.1% of total</div>
+      </div>
+      <div class="ice-layer ice-sub">
+        <div class="il-name">.onion Hidden Services</div>
+        <div class="il-desc">~60,000 active V3 onion addresses</div>
+        <div class="il-pct">~0.01%</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 5: Legitimate Use -->
+<section id="use">
+  <div class="wrap">
+    <div class="sec-label">05 &mdash; Legitimate Applications</div>
+    <h2 class="sec-h">Socially Valuable <span class="highlight">Uses</span></h2>
+    <p class="sec-p wide">A substantial portion of dark web infrastructure serves lawful, socially valuable functions that are often overlooked in coverage focused exclusively on illicit markets.</p>
+
+    <div class="card-grid">
+      <div class="card">
+        <div class="c-num">01</div>
+        <h3>Whistleblowing &amp; SecureLeaks</h3>
+        <p>SecureDrop, used by 500+ media organizations, routes submissions through Tor onion services. Sources can leak documents without exposing metadata. Amnesty International and the BBC operate .onion mirrors for users behind national firewalls.</p>
+        <span class="tag tag-g">Legitimate</span>
+      </div>
+      <div class="card">
+        <div class="c-num">02</div>
+        <h3>Censorship Circumvention</h3>
+        <p>In China, Russia, Iran, and Turkey, Tor bridges and pluggable transports (WebTunnel, Snowflake) allow citizens to bypass firewalls. Russia blocks Tor since 2021, yet ~300,000 Russian users access the network daily via bridges.</p>
+        <span class="tag tag-g">Legitimate</span>
+      </div>
+      <div class="card">
+        <div class="c-num">03</div>
+        <h3>Privacy &amp; Personal Safety</h3>
+        <p>Journalists, lawyers, activists, and domestic abuse survivors use Tor to resist tracking. 85% of Tor traffic targets cleartnet websites, not hidden services. The network&rsquo;s privacy guarantees protect vulnerable populations globally.</p>
+        <span class="tag tag-g">Legitimate</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 6: Illicit -->
+<section id="market">
+  <div class="wrap">
+    <div class="sec-label">06 &mdash; Criminal Ecosystems</div>
+    <h2 class="sec-h">Illicit Markets &amp; <span class="highlight">Crime</span></h2>
+    <p class="sec-p wide">Darknet markets processed approximately <code>$2.6B</code> in cryptocurrency inflows in 2025. The ecosystem has evolved from Silk Road into a resilient network of interconnected markets that rapidly adapt to takedowns.</p>
+
+    <div class="card-grid">
+      <div class="card">
+        <div class="c-num">Drugs</div>
+        <h3>Narcotics Trade</h3>
+        <p>Markups from wholesale to darknet retail: MDMA (3&ndash;5x), fentanyl precursors (10&ndash;20x), prescription stimulants (2&ndash;3x). Darknet prices undercut street prices by 40&ndash;60%. Major markets include TorZon, WeTheNorth, and Kraken.</p>
+        <span class="tag tag-r">Illicit</span>
+      </div>
+      <div class="card">
+        <div class="c-num">Fraud</div>
+        <h3>Identity &amp; Financial Crime</h3>
+        <p>CVV dumps trade at $10&ndash;40 (US), fullz identity packages at $15&ndash;35 (US), tiered by region. Russian Market and Brian&rsquo;s Club are prominent credential shops. GozNym botnet attempted $100M in theft.</p>
+        <span class="tag tag-r">Illicit</span>
+      </div>
+      <div class="card">
+        <div class="c-num">RaaS</div>
+        <h3>Ransomware as a Service</h3>
+        <p>LockBit operates an 80/20 affiliate split. Average ransom demand in manufacturing: $1.2M (2025). RaaS relies on initial access brokers, Tor-hosted negotiation portals, and double-extortion leak sites.</p>
+        <span class="tag tag-r">Illicit</span>
+      </div>
+    </div>
+
+    <div class="pull">
+      <p>Over 99% of dark web &ldquo;hitman&rdquo; services are scams run by fraudsters or law enforcement stings. ATF data shows dark web firearm sales account for <strong>0.1%</strong> of illegal trafficking routes. The real weapons black market operates on the clearnet, not the dark web.</p>
+      <div class="ref">Source: GAO-18-24, VT Tech for Humanity Lab (2025)</div>
+    </div>
+  </div>
+</section>
+
+<!-- 7: OpSec Failures -->
+<section id="opsec">
+  <div class="wrap">
+    <div class="sec-label">07 &mdash; How They Get Caught</div>
+    <h2 class="sec-h">Operational Security <span class="highlight">Failures</span></h2>
+    <p class="sec-p wide">The defining finding from two decades of dark web investigations: <strong>over 80% of major busts result from operational mistakes, not cryptographic breaks of Tor.</strong> Human error and infrastructure misconfiguration provide the attack surface.</p>
+
+    <div class="card-grid">
+      <div class="card">
+        <div class="c-num">Silk Road</div>
+        <h3>Clearnet Email Link</h3>
+        <p>Ross Ulbricht posted on Bitcointalk as &ldquo;altoid&rdquo; using his personal Gmail. A misconfigured CAPTCHA leaked the server&rsquo;s real IP in Iceland. Arrested in a library while logged into the admin panel.</p>
+        <span class="tag tag-y">Email + Server Leak</span>
+      </div>
+      <div class="card">
+        <div class="c-num">AlphaBay</div>
+        <h3>Identity Cross-Contamination</h3>
+        <p>Alexandre Cazes linked via early promotional emails, hosting records for his company EBX Technologies, and server metadata connecting personal IPs to market infrastructure. Arrested in Thailand mid-session.</p>
+        <span class="tag tag-y">Infrastructure Linkage</span>
+      </div>
+      <div class="card">
+        <div class="c-num">Welcome to Video</div>
+        <h3>Blockchain Tracing</h3>
+        <p>IRS-CI traced Bitcoin payments through Blockchain.info APIs and Coinbase KYC to identify the operator (a former DHS analyst). Resulted in 337 arrests across 38 countries.</p>
+        <span class="tag tag-y">Financial Forensics</span>
+      </div>
+      <div class="card">
+        <div class="c-num">Darkode</div>
+        <h3>Undercover Infiltration</h3>
+        <p>FBI agents embedded as forum members for 18 months, eventually gaining moderator access. Documented every trade before coordinated takedown. Infraud&rsquo;s admin was identified via a PayPal payment made under his legal name.</p>
+        <span class="tag tag-y">Human Intelligence + Payment Trail</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 8: Crypto -->
+<section id="crypto">
+  <div class="wrap">
+    <div class="sec-label">08 &mdash; Financial Tracing</div>
+    <h2 class="sec-h">Cryptocurrency <span class="highlight">Forensics</span></h2>
+    <p class="sec-p wide">Bitcoin&rsquo;s public ledger enables sophisticated forensic clustering. Modern tools can link approximately <code>60%</code> of all Bitcoin transactions to known entities using common-spend heuristics, change-address detection, and temporal pattern matching.</p>
+
+    <div class="dt-wrap">
+      <table class="dt">
+        <thead>
+          <tr>
+            <th>Asset</th>
+            <th>Privacy</th>
+            <th>Forensic Status</th>
+            <th>Key Case</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>Bitcoin</strong></td>
+            <td><span class="tag tag-r">Low</span></td>
+            <td>~60% of transactions clusterable. Chainalysis: 94.85% TPR, 0.01% FPR. Daubert-admissible.</td>
+            <td>Bitcoin Fog: $400M traced via blockchain + Google Ads + IP logs. No server access needed.</td>
+          </tr>
+          <tr>
+            <td><strong>Monero</strong></td>
+            <td><span class="tag tag-g">High</span></td>
+            <td>Ring signatures resist analysis. ML improves true-spender guessing by only ~4pp over random. Attribution via off-chain KYC, not protocol break.</td>
+            <td>No documented cryptographic break. BKA/CIA attribution via exchange watch-lists.</td>
+          </tr>
+          <tr>
+            <td><strong>Wasabi CoinJoin</strong></td>
+            <td><span class="tag tag-y">Medium</span></td>
+            <td>Median anonymity set: ~47. Vulnerable to timing analysis when correlated with exchange data. Address reuse defeats mixing.</td>
+            <td>Samourai developers prosecuted (2025). CoinJoin software classified as unlicensed money transmission.</td>
+          </tr>
+          <tr>
+            <td><strong>Cross-Chain</strong></td>
+            <td><span class="tag tag-y">Medium</span></td>
+            <td>Elliptic tracks 300+ bridges, 55+ chains. Chain-hopping now used in 30%+ of complex laundering cases.</td>
+            <td>BTC to ETH to USDT to XMR via DEXs is the standard modern laundering pipeline.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="iblock">
+      <p><strong>Bitcoin Fog Precedent:</strong> Roman Sterlingov was convicted in 2024 for laundering $400M+ through the Bitcoin Fog mixer. The government&rsquo;s case relied entirely on Chainalysis flow tracing, Google Ads data linking Sterlingov to promotional domains, and cloud IP logs connecting infrastructure to his accounts. No undercover access to the mixer servers was required. This established blockchain analytics as admissible expert evidence under the Daubert standard.</p>
+    </div>
+  </div>
+</section>
+
+<!-- 9: Zero-Day -->
+<section id="zeroday">
+  <div class="wrap">
+    <div class="sec-label">09 &mdash; Vulnerability Markets</div>
+    <h2 class="sec-h">Zero-Day Exploit <span class="highlight">Supply Chain</span></h2>
+    <p class="sec-p wide">Software vulnerabilities unknown to vendors are among the most valuable commodities in cybersecurity. Brokers acquire exploits from researchers and license them to government customers worldwide.</p>
+
+    <div class="dt-wrap">
+      <table class="dt">
+        <thead>
+          <tr>
+            <th>Target</th>
+            <th>Zerodium</th>
+            <th>Operation Zero</th>
+            <th>Gray Market</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td><strong>iOS</strong> (full chain)</td><td>$2M</td><td>$3M</td><td>$2.5&ndash;4M</td></tr>
+          <tr><td><strong>Android</strong> (full chain)</td><td>$2.5M</td><td>$2.5M</td><td>$3&ndash;5M</td></tr>
+          <tr><td><strong>Chrome</strong> RCE</td><td>$1.2M</td><td>$1.2M</td><td>$1.5&ndash;2M</td></tr>
+          <tr><td><strong>Signal</strong> RCE</td><td>$500K&ndash;2M</td><td>$1.5M</td><td>$2M+</td></tr>
+          <tr><td><strong>WhatsApp</strong> RCE</td><td>$1.5M</td><td>$1.5M</td><td>$2M</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <p class="sec-p wide">The pipeline follows a consistent flow: independent researchers discover vulnerabilities and sell to gray-market brokers (Zerodium, Exodus Intelligence, Operation Zero) who weaponize and license exploits to government clients. Black-market forums (XSS.is, Exploit.in, RAMP) occasionally bypass formal brokers, selling directly to criminal actors. Stuxnet&rsquo;s deployment of four simultaneous zero-days in 2010 remains the landmark demonstration of state-level exploit integration.</p>
+  </div>
+</section>
+
+<!-- 10: Censorship -->
+<section>
+  <div class="wrap">
+    <div class="sec-label">10 &mdash; The Arms Race</div>
+    <h2 class="sec-h">Censorship Resistance <span class="highlight">2026</span></h2>
+    <p class="sec-p wide">Russia, China, and Iran deploy DPI, ML-based traffic classification, and active probing to block Tor. The Tor Project responds with pluggable transports that must constantly evolve to stay ahead of detection.</p>
+
+    <div class="dt-wrap">
+      <table class="dt">
+        <thead>
+          <tr>
+            <th>Country</th>
+            <th>Method</th>
+            <th>Detection Rate</th>
+            <th>Tor Countermeasure</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>Russia</strong></td>
+            <td>DPI + TLS fingerprint + IP blocking (TSPU/SORM-3)</td>
+            <td>~75% of known bridges</td>
+            <td>WebTunnel bridges. ~300k daily Russian Tor users via bridges.</td>
+          </tr>
+          <tr>
+            <td><strong>China</strong></td>
+            <td>Active probing + ML classification + DNS poisoning</td>
+            <td>High bridge turnover required</td>
+            <td>Snowflake (500k daily users), Shadowsocks-over-KCP.</td>
+          </tr>
+          <tr>
+            <td><strong>Iran</strong></td>
+            <td>NIN DPI, WireGuard/Shadowsocks blocking</td>
+            <td>Medium. Selective bypass possible.</td>
+            <td>Conjure (IPv6 decoy routing) shows promise as reliable bypass.</td>
+          </tr>
+          <tr>
+            <td><strong>Turkey</strong></td>
+            <td>DPI + periodic directory authority blocking</td>
+            <td>Variable, situation-dependent</td>
+            <td>obfs4 + Snowflake + meek</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="pull">
+      <p>No single transport works everywhere. Bridge diversity is essential. The censorship arms race is asymmetric: censors need one reliable detection method; Tor needs every transport to work in every censored country simultaneously.</p>
+      <div class="ref">Source: Tor Project Blog (2024&ndash;2026), OONI Measurements</div>
+    </div>
+  </div>
+</section>
+
+<!-- 11: Beyond Tor -->
+<section>
+  <div class="wrap">
+    <div class="sec-label">11 &mdash; Adjacent Networks</div>
+    <h2 class="sec-h">Beyond Tor: Other <span class="highlight">Darknets</span></h2>
+    <p class="sec-p wide">While Tor dominates with 2.5M daily users, several other anonymity networks serve specialized niches within the dark web ecosystem, each with distinct architectures and use cases.</p>
+
+    <div class="dt-wrap">
+      <table class="dt">
+        <thead>
+          <tr>
+            <th>Network</th>
+            <th>Architecture</th>
+            <th>Users (2026)</th>
+            <th>Primary Use</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td><strong>Tor</strong></td><td>Onion routing (3-hop)</td><td>~2.5M daily</td><td>Clearnet privacy, .onion services, censorship circumvention</td></tr>
+          <tr><td><strong>I2P</strong></td><td>Garlic routing, ECIES-X25519</td><td>~20&ndash;25k</td><td>Internal eepsites, IRC, file sharing</td></tr>
+          <tr><td><strong>Hyphanet</strong></td><td>P2P encrypted datastore</td><td>~500 nodes</td><td>File sharing in repressive regions (Sudan, Myanmar, Afghanistan)</td></tr>
+          <tr><td><strong>Yggdrasil</strong></td><td>Encrypted IPv6 mesh</td><td>~15k nodes</td><td>Decentralized mesh networking</td></tr>
+          <tr><td><strong>Briar / Cwtch</strong></td><td>Tor + offline BLE/Wi-Fi sync</td><td>Niche</td><td>Off-grid messaging during internet shutdowns</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- 12: Future -->
+<section>
+  <div class="wrap">
+    <div class="sec-label">12 &mdash; Outlook</div>
+    <h2 class="sec-h">Future <span class="highlight">Directions</span></h2>
+    <p class="sec-p wide">The dark web ecosystem continues to evolve in response to technological advances, policy shifts, and law enforcement innovation. Several trends will shape the landscape through the remainder of the decade.</p>
+
+    <div class="card-grid">
+      <div class="card">
+        <div class="c-num">PQ</div>
+        <h3>Post-Quantum Cryptography</h3>
+        <p>NSA and NIST assess CRQC threat within 8&ndash;15 years. Tor dev branch tests hybrid ntor-PQ handshakes. Migration will be complex given the distributed relay infrastructure.</p>
+        <span class="tag tag-b">8&ndash;15 year timeline</span>
+      </div>
+      <div class="card">
+        <div class="c-num">WF</div>
+        <h3>Website Fingerprinting</h3>
+        <p>Deep learning attacks achieve 95&ndash;98% accuracy in closed-world settings. Defenses reduce but do not eliminate risk. Low adoption among operational users due to overhead costs.</p>
+        <span class="tag tag-b">Persistent threat</span>
+      </div>
+      <div class="card">
+        <div class="c-num">LE</div>
+        <h3>Law Enforcement Evolution</h3>
+        <p>Honeypot markets, encrypted device stings (An0m), undercover infiltration, blockchain analytics, and mercenary spyware have become standard tools. The operational capability gap between LE and targets continues to widen.</p>
+        <span class="tag tag-b">Growing asymmetry</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Stats -->
+<section>
+  <div class="wrap">
+    <div class="sec-label">Reference</div>
+    <h2 class="sec-h">Key Figures</h2>
+    <div class="stat-row">
+      <div class="stat-box"><div class="s-num">2.5M</div><div class="s-label">Daily Tor Users</div></div>
+      <div class="stat-box"><div class="s-num cyan">7K</div><div class="s-label">Tor Relays</div></div>
+      <div class="stat-box"><div class="s-num green">3K</div><div class="s-label">Guard Nodes</div></div>
+      <div class="stat-box"><div class="s-num mono">$2.6B</div><div class="s-label">Market Inflows (2025)</div></div>
+      <div class="stat-box"><div class="s-num cyan">98%</div><div class="s-label">WF Attack Accuracy</div></div>
+      <div class="stat-box"><div class="s-num red">80%+</div><div class="s-label">Busts = OpSec Errors</div></div>
+      <div class="stat-box"><div class="s-num amber">800+</div><div class="s-label">An0m Arrests</div></div>
+      <div class="stat-box"><div class="s-num green">337</div><div class="s-label">Welcome to Video Arrests</div></div>
+    </div>
+
+    <p class="sec-p wide" style="margin-top:32px;">Data drawn from court filings, declassified intelligence (Snowden archive), peer-reviewed research (ACM CCS, USENIX Security, IEEE, PoPETs, arXiv), industry reports (Chainalysis, TRM Labs, Elliptic), government sources (UNODC, DEA, ATF/GAO, DOJ, FBI, Europol), and Tor Project publications. All figures represent the most recent verifiable data as of mid-2026.</p>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <div class="fw">
+      <p>DARK WEB &mdash; Investigative Brief 2026</p>
+      <p class="mono">Educational Reference &bull; Sources Cited</p>
+    </div>
+  </div>
+</footer>
+
+<script>
+  document.querySelectorAll('nav ul a').forEach(function(el) {
+    el.addEventListener('click', function() {
+      document.querySelector('nav ul').classList.remove('open');
+    });
+  });
+
+  var observer = new IntersectionObserver(function(entries) {
+    entries.forEach(function(entry) {
+      if (entry.isIntersecting) {
+        entry.target.style.opacity = '1';
+        entry.target.style.transform = 'translateY(0)';
+      }
+    });
+  }, { threshold: 0.08 });
+
+  document.querySelectorAll('section, .card, .stat-box, .tl-item, .col-block, .ice-layer, .dt-wrap').forEach(function(el) {
+    el.style.opacity = '0';
+    el.style.transform = 'translateY(16px)';
+    el.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+    observer.observe(el);
+  });
+</script>
+</body>
+</html>
